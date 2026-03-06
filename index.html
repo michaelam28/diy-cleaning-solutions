@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DIY Cleaning Solutions</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --green-dark: #1a2e1c;
+      --green-mid: #2d6e3e;
+      --green-main: #4a7c59;
+      --green-light: #7ec896;
+      --green-pale: #e8f5ec;
+      --green-wash: #f0f9f3;
+      --cream: #fafff8;
+      --text: #1a2e1c;
+      --text-muted: #5a7a5e;
+      --border: #d4edda;
+      --white: #ffffff;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); min-height: 100vh; }
+
+    .header {
+      background: linear-gradient(135deg, var(--green-dark) 0%, #1e4a28 60%, var(--green-mid) 100%);
+      padding: 40px 24px 32px; position: relative; overflow: hidden;
+    }
+    .header::before {
+      content: ''; position: absolute; top: -80px; right: -80px;
+      width: 320px; height: 320px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(126,200,150,0.12) 0%, transparent 70%);
+    }
+    .header-inner { max-width: 960px; margin: 0 auto; position: relative; z-index: 1; }
+    .header-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(126,200,150,0.15); border: 1px solid rgba(126,200,150,0.3);
+      border-radius: 20px; padding: 4px 14px; margin-bottom: 16px;
+      font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase;
+      color: var(--green-light); font-weight: 600;
+    }
+    .header h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(32px, 6vw, 50px); font-weight: 600;
+      color: #fff; line-height: 1.1; margin-bottom: 10px;
+    }
+    .header h1 em { font-style: italic; color: var(--green-light); }
+    .header-sub { color: rgba(168,213,181,0.8); font-size: 14px; font-weight: 300; }
+    .count-badge {
+      display: inline-block; margin-top: 12px;
+      background: rgba(255,255,255,0.1); border-radius: 12px;
+      padding: 6px 16px; font-size: 13px; color: rgba(255,255,255,0.7);
+    }
+    .count-badge span { color: #fff; font-weight: 600; }
+
+    .controls-wrap { background: var(--white); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; box-shadow: 0 2px 12px rgba(26,46,28,0.06); }
+    .controls { max-width: 960px; margin: 0 auto; padding: 14px 24px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .search-wrap { position: relative; flex: 1; min-width: 200px; }
+    .search-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--green-main); pointer-events: none; }
+    .search-wrap input {
+      width: 100%; padding: 10px 14px 10px 38px;
+      border: 1.5px solid var(--border); border-radius: 10px;
+      font-size: 14px; color: var(--text); background: var(--green-wash);
+      font-family: inherit; outline: none; transition: border-color 0.2s;
+    }
+    .search-wrap input:focus { border-color: var(--green-main); }
+    select {
+      padding: 10px 14px; border-radius: 10px; border: 1.5px solid var(--border);
+      font-size: 13px; color: var(--text); background: var(--green-wash);
+      font-family: inherit; outline: none; cursor: pointer;
+    }
+    .btn-add {
+      display: flex; align-items: center; gap: 6px;
+      background: linear-gradient(135deg, var(--green-main), var(--green-mid));
+      color: #fff; border: none; border-radius: 10px;
+      padding: 10px 20px; font-size: 14px; font-weight: 600;
+      cursor: pointer; font-family: inherit; white-space: nowrap;
+      transition: opacity 0.2s;
+    }
+    .btn-add:hover { opacity: 0.88; }
+
+    .status-bar { max-width: 960px; margin: 0 auto; padding: 6px 24px 10px; }
+    .status-dot { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: #ccc; flex-shrink: 0; }
+    .dot.synced { background: #4caf50; }
+    .dot.syncing { background: #ff9800; animation: pulse 1s infinite; }
+    .dot.error { background: #f44336; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+    .main { max-width: 960px; margin: 0 auto; padding: 24px; }
+    .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr)); }
+
+    .card { background: var(--white); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; transition: box-shadow 0.2s, transform 0.2s; }
+    .card:hover { box-shadow: 0 10px 32px rgba(26,46,28,0.12); transform: translateY(-2px); }
+    .card-top { padding: 20px 20px 0; cursor: pointer; }
+    .card-title { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; color: var(--green-dark); margin-bottom: 10px; line-height: 1.3; }
+    .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .tag { padding: 3px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+    .tag-room { background: var(--green-pale); color: var(--green-mid); }
+    .tag-surface { background: #f0f9f3; color: var(--green-main); }
+    .card-actions { display: flex; gap: 6px; justify-content: flex-end; padding: 0 16px 16px; }
+    .btn-icon { display: flex; align-items: center; gap: 5px; border: none; border-radius: 8px; padding: 7px 11px; cursor: pointer; font-size: 13px; font-family: inherit; font-weight: 500; transition: opacity 0.2s; }
+    .btn-icon:hover { opacity: 0.78; }
+    .btn-pdf { background: var(--green-pale); color: var(--green-mid); }
+    .btn-edit { background: #f5f5f5; color: #555; }
+    .btn-del { background: #fef2f2; color: #dc2626; }
+    .card-expand { padding: 0 20px 20px; border-top: 1px solid var(--green-pale); }
+    .sec-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--green-main); font-weight: 700; margin: 16px 0 10px; }
+    .ing-row { display: flex; padding: 7px 0; border-bottom: 1px solid var(--green-wash); font-size: 14px; }
+    .ing-amount { font-weight: 600; color: var(--green-mid); min-width: 110px; }
+    .ing-item { color: var(--text-muted); }
+    .instr-text { font-size: 14px; line-height: 1.8; color: #3d4e3e; }
+    .tips-box { background: var(--green-wash); border-left: 3px solid var(--green-main); padding: 12px 16px; border-radius: 0 8px 8px 0; margin-top: 4px; font-size: 14px; line-height: 1.7; color: #3d4e3e; }
+
+    .empty { text-align: center; padding: 80px 20px; }
+    .empty-icon { font-size: 52px; margin-bottom: 16px; }
+    .empty h3 { font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--green-dark); margin-bottom: 8px; }
+    .empty p { color: var(--text-muted); font-size: 14px; }
+    .loading { text-align: center; padding: 80px 20px; }
+    .spinner { width: 36px; height: 36px; border: 3px solid var(--green-pale); border-top-color: var(--green-main); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+    .overlay.open { opacity: 1; pointer-events: all; }
+    .modal { background: var(--white); border-radius: 20px; width: 100%; max-width: 560px; max-height: 92vh; overflow-y: auto; box-shadow: 0 24px 60px rgba(0,0,0,0.25); transform: translateY(20px); transition: transform 0.2s; }
+    .overlay.open .modal { transform: translateY(0); }
+    .modal-header { position: sticky; top: 0; background: var(--white); padding: 22px 24px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; z-index: 1; }
+    .modal-header h2 { font-family: 'Cormorant Garamond', serif; font-size: 24px; color: var(--green-dark); }
+    .btn-close { background: none; border: none; cursor: pointer; color: #999; font-size: 22px; padding: 2px 6px; line-height: 1; }
+    .modal-body { padding: 22px 24px; display: flex; flex-direction: column; gap: 16px; }
+    .field-label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--green-main); font-weight: 700; display: block; margin-bottom: 6px; }
+    .field-input { width: 100%; padding: 10px 14px; border-radius: 10px; border: 1.5px solid var(--border); font-size: 14px; color: var(--text); background: var(--green-wash); font-family: inherit; outline: none; transition: border-color 0.2s; }
+    .field-input:focus { border-color: var(--green-main); }
+    textarea.field-input { resize: vertical; min-height: 90px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .ing-row-form { display: flex; gap: 8px; margin-bottom: 8px; }
+    .ing-amount-input { width: 130px; flex-shrink: 0; padding: 10px 14px; border-radius: 10px; border: 1.5px solid var(--border); font-size: 14px; background: var(--green-wash); font-family: inherit; outline: none; }
+    .ing-item-input { flex: 1; padding: 10px 14px; border-radius: 10px; border: 1.5px solid var(--border); font-size: 14px; background: var(--green-wash); font-family: inherit; outline: none; }
+    .btn-remove-ing { background: #fef2f2; border: none; border-radius: 8px; padding: 0 12px; color: #dc2626; cursor: pointer; font-size: 16px; flex-shrink: 0; }
+    .btn-add-ing { width: 100%; background: none; border: 1.5px dashed var(--green-main); border-radius: 10px; padding: 9px; color: var(--green-main); font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; margin-top: 4px; }
+    .btn-add-ing:hover { background: var(--green-pale); }
+    .btn-save { width: 100%; background: linear-gradient(135deg, var(--green-main), var(--green-mid)); color: #fff; border: none; border-radius: 12px; padding: 14px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; transition: opacity 0.2s; }
+    .btn-save:hover { opacity: 0.9; }
+
+    .confirm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .confirm-box { background: #fff; border-radius: 16px; padding: 28px; max-width: 360px; width: 100%; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
+    .confirm-box h3 { font-family: 'Cormorant Garamond', serif; font-size: 22px; margin-bottom: 10px; }
+    .confirm-box p { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; }
+    .confirm-btns { display: flex; gap: 10px; }
+    .btn-cancel { flex: 1; padding: 11px; border-radius: 10px; border: 1.5px solid var(--border); background: #fff; font-family: inherit; font-size: 14px; cursor: pointer; color: var(--text-muted); }
+    .btn-confirm-del { flex: 1; padding: 11px; border-radius: 10px; border: none; background: #dc2626; color: #fff; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--green-wash); }
+    ::-webkit-scrollbar-thumb { background: #a8d5b5; border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-badge">🌿 Private Collection</div>
+    <h1>DIY Cleaning<br><em>Solutions</em></h1>
+    <p class="header-sub">Your personal homemade cleaning recipes</p>
+    <div class="count-badge"><span id="total-count">0</span> recipes saved</div>
+  </div>
+</div>
+
+<div class="controls-wrap">
+  <div class="controls">
+    <div class="search-wrap">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="search" placeholder="Search solutions or ingredients..." oninput="renderCards()" />
+    </div>
+    <select id="filter-room" onchange="renderCards()"><option value="">All Rooms</option></select>
+    <select id="filter-surface" onchange="renderCards()"><option value="">All Surfaces</option></select>
+    <button class="btn-add" onclick="openModal()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add New
+    </button>
+  </div>
+  <div class="status-bar">
+    <span class="status-dot">
+      <span class="dot syncing" id="sync-dot"></span>
+      <span id="sync-text">Connecting to Firebase...</span>
+    </span>
+  </div>
+</div>
+
+<div class="main">
+  <div id="loading" class="loading">
+    <div class="spinner"></div>
+    <p style="color:var(--text-muted);font-size:14px;">Loading your collection...</p>
+  </div>
+  <div id="grid" class="grid" style="display:none;"></div>
+  <div id="empty" class="empty" style="display:none;">
+    <div class="empty-icon">🌿</div>
+    <h3>Your collection is empty</h3>
+    <p>Tap "Add New" to save your first cleaning recipe!</p>
+  </div>
+  <div id="no-results" class="empty" style="display:none;">
+    <div class="empty-icon">🔍</div>
+    <h3>No results found</h3>
+    <p>Try adjusting your search or filters.</p>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modal-title">New Solution</h2>
+      <button class="btn-close" onclick="closeModal()">&#x2715;</button>
+    </div>
+    <div class="modal-body">
+      <div>
+        <label class="field-label">Solution Name</label>
+        <input type="text" class="field-input" id="f-name" placeholder="e.g. All-Purpose Kitchen Cleaner" />
+      </div>
+      <div class="grid-2">
+        <div>
+          <label class="field-label">Room</label>
+          <select class="field-input" id="f-room">
+            <option>Kitchen</option><option>Bathroom</option><option>Living Room</option>
+            <option>Bedroom</option><option>Laundry</option><option>Garage</option><option>All Purpose</option>
+          </select>
+        </div>
+        <div>
+          <label class="field-label">Surface Type</label>
+          <select class="field-input" id="f-surface">
+            <option>Glass</option><option>Wood</option><option>Tile</option><option>Granite</option>
+            <option>Stainless Steel</option><option>Fabric</option><option>Plastic</option>
+            <option>Grout</option><option>All Surfaces</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label class="field-label">Ingredients</label>
+        <div id="ingredients-list"></div>
+        <button class="btn-add-ing" onclick="addIngredientRow()">+ Add Ingredient</button>
+      </div>
+      <div>
+        <label class="field-label">Instructions</label>
+        <textarea class="field-input" id="f-instructions" placeholder="Step-by-step instructions..."></textarea>
+      </div>
+      <div>
+        <label class="field-label">Tips &amp; Notes</label>
+        <textarea class="field-input" id="f-tips" placeholder="Helpful tips, storage info, cautions..." style="min-height:70px;"></textarea>
+      </div>
+      <button class="btn-save" onclick="saveSolution()" id="btn-save">Save Solution</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM -->
+<div id="confirm-overlay" class="confirm-overlay" style="display:none;">
+  <div class="confirm-box">
+    <h3>Delete Solution?</h3>
+    <p>This will permanently remove this recipe from your collection.</p>
+    <div class="confirm-btns">
+      <button class="btn-cancel" onclick="cancelDelete()">Cancel</button>
+      <button class="btn-confirm-del" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyALrmfjfEhouI6_F1O7gesBL6Kr0kObc0g",
+    authDomain: "cleanitfixitbuffit.firebaseapp.com",
+    projectId: "cleanitfixitbuffit",
+    storageBucket: "cleanitfixitbuffit.firebasestorage.app",
+    messagingSenderId: "777948154134",
+    appId: "1:777948154134:web:4636e2778282ace273e837"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const colRef = collection(db, "solutions");
+
+  window._addDoc = async (data) => await addDoc(colRef, data);
+  window._updateDoc = async (id, data) => await updateDoc(doc(db, "solutions", id), data);
+  window._deleteDoc = async (id) => await deleteDoc(doc(db, "solutions", id));
+
+  setStatus("syncing", "Connecting...");
+
+  onSnapshot(colRef, (snapshot) => {
+    window._solutions = [];
+    snapshot.forEach(d => window._solutions.push({ id: d.id, ...d.data() }));
+    document.getElementById("total-count").textContent = window._solutions.length;
+    populateFilters();
+    renderCards();
+    document.getElementById("loading").style.display = "none";
+    setStatus("synced", "Synced — changes appear on all your devices");
+  }, (err) => {
+    console.error(err);
+    setStatus("error", "Connection error — check Firestore rules in Firebase console");
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("empty").style.display = "";
+  });
+</script>
+
+<script>
+  window._solutions = [];
+  window._editingId = null;
+  window._deletingId = null;
+
+  function setStatus(state, text) {
+    const dot = document.getElementById("sync-dot");
+    const label = document.getElementById("sync-text");
+    dot.className = "dot " + state;
+    label.textContent = text;
+  }
+
+  function esc(str) {
+    if (!str) return "";
+    return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+
+  function populateFilters() {
+    const rooms = [...new Set(window._solutions.map(s => s.room).filter(Boolean))];
+    const surfaces = [...new Set(window._solutions.map(s => s.surface).filter(Boolean))];
+    const roomSel = document.getElementById("filter-room");
+    const surfSel = document.getElementById("filter-surface");
+    const curRoom = roomSel.value;
+    const curSurf = surfSel.value;
+    roomSel.innerHTML = '<option value="">All Rooms</option>' + rooms.map(r => `<option value="${r}">${r}</option>`).join("");
+    surfSel.innerHTML = '<option value="">All Surfaces</option>' + surfaces.map(s => `<option value="${s}">${s}</option>`).join("");
+    roomSel.value = curRoom;
+    surfSel.value = curSurf;
+  }
+
+  function renderCards() {
+    const search = document.getElementById("search").value.toLowerCase();
+    const room = document.getElementById("filter-room").value;
+    const surface = document.getElementById("filter-surface").value;
+
+    const filtered = window._solutions.filter(s => {
+      const matchSearch = !search || s.name.toLowerCase().includes(search) || (s.ingredients||[]).some(i => i.item.toLowerCase().includes(search));
+      const matchRoom = !room || s.room === room;
+      const matchSurf = !surface || s.surface === surface;
+      return matchSearch && matchRoom && matchSurf;
+    });
+
+    const grid = document.getElementById("grid");
+    const empty = document.getElementById("empty");
+    const noResults = document.getElementById("no-results");
+
+    if (window._solutions.length === 0) {
+      grid.style.display = "none"; empty.style.display = ""; noResults.style.display = "none"; return;
+    }
+    if (filtered.length === 0) {
+      grid.style.display = "none"; empty.style.display = "none"; noResults.style.display = ""; return;
+    }
+
+    grid.style.display = ""; empty.style.display = "none"; noResults.style.display = "none";
+    grid.innerHTML = filtered.map(s => `
+      <div class="card">
+        <div class="card-top" onclick="toggleCard('${s.id}')">
+          <div class="card-title">${esc(s.name)}</div>
+          <div class="tags">
+            <span class="tag tag-room">🏠 ${esc(s.room)}</span>
+            <span class="tag tag-surface">&#x2736; ${esc(s.surface)}</span>
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="btn-icon btn-pdf" onclick="downloadPDF('${s.id}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            PDF
+          </button>
+          <button class="btn-icon btn-edit" onclick="openModal('${s.id}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="btn-icon btn-del" onclick="askDelete('${s.id}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          </button>
+        </div>
+        <div class="card-expand" id="expand-${s.id}" style="display:none;">
+          <p class="sec-label">Ingredients</p>
+          ${(s.ingredients||[]).map(i => `<div class="ing-row"><span class="ing-amount">${esc(i.amount)}</span><span class="ing-item">${esc(i.item)}</span></div>`).join("")}
+          <p class="sec-label">Instructions</p>
+          <p class="instr-text">${esc(s.instructions)}</p>
+          ${s.tips ? `<p class="sec-label">Tips &amp; Notes</p><div class="tips-box">${esc(s.tips)}</div>` : ""}
+        </div>
+      </div>
+    `).join("");
+  }
+
+  function toggleCard(id) {
+    const el = document.getElementById("expand-" + id);
+    if (el) el.style.display = el.style.display === "none" ? "block" : "none";
+  }
+
+  function openModal(id) {
+    window._editingId = id || null;
+    document.getElementById("modal-title").textContent = id ? "Edit Solution" : "New Solution";
+    document.getElementById("btn-save").textContent = id ? "Save Changes" : "Save Solution";
+    if (id) {
+      const s = window._solutions.find(s => s.id === id);
+      if (!s) return;
+      document.getElementById("f-name").value = s.name || "";
+      document.getElementById("f-room").value = s.room || "Kitchen";
+      document.getElementById("f-surface").value = s.surface || "Glass";
+      document.getElementById("f-instructions").value = s.instructions || "";
+      document.getElementById("f-tips").value = s.tips || "";
+      renderIngredients(s.ingredients || [{ amount: "", item: "" }]);
+    } else {
+      document.getElementById("f-name").value = "";
+      document.getElementById("f-room").value = "Kitchen";
+      document.getElementById("f-surface").value = "Glass";
+      document.getElementById("f-instructions").value = "";
+      document.getElementById("f-tips").value = "";
+      renderIngredients([{ amount: "", item: "" }]);
+    }
+    document.getElementById("modal-overlay").classList.add("open");
+  }
+
+  function closeModal() {
+    document.getElementById("modal-overlay").classList.remove("open");
+    window._editingId = null;
+  }
+
+  function handleOverlayClick(e) {
+    if (e.target === document.getElementById("modal-overlay")) closeModal();
+  }
+
+  function renderIngredients(ings) {
+    document.getElementById("ingredients-list").innerHTML = ings.map((ing, i) => `
+      <div class="ing-row-form">
+        <input class="ing-amount-input" type="text" placeholder="Amount" value="${esc(ing.amount)}" />
+        <input class="ing-item-input" type="text" placeholder="Ingredient" value="${esc(ing.item)}" />
+        ${ings.length > 1 ? `<button class="btn-remove-ing" onclick="removeIngredient(${i})">&#x2715;</button>` : ""}
+      </div>
+    `).join("");
+  }
+
+  function addIngredientRow() {
+    renderIngredients([...getIngredients(), { amount: "", item: "" }]);
+  }
+
+  function removeIngredient(i) {
+    const rows = getIngredients();
+    rows.splice(i, 1);
+    renderIngredients(rows);
+  }
+
+  function getIngredients() {
+    return Array.from(document.querySelectorAll("#ingredients-list .ing-row-form")).map(row => {
+      const inputs = row.querySelectorAll("input");
+      return { amount: inputs[0].value, item: inputs[1].value };
+    });
+  }
+
+  async function saveSolution() {
+    const name = document.getElementById("f-name").value.trim();
+    if (!name) { alert("Please enter a solution name."); return; }
+
+    const data = {
+      name,
+      room: document.getElementById("f-room").value,
+      surface: document.getElementById("f-surface").value,
+      ingredients: getIngredients().filter(i => i.item.trim()),
+      instructions: document.getElementById("f-instructions").value.trim(),
+      tips: document.getElementById("f-tips").value.trim(),
+      updatedAt: new Date().toISOString()
+    };
+
+    setStatus("syncing", "Saving...");
+    try {
+      if (window._editingId) {
+        await window._updateDoc(window._editingId, data);
+      } else {
+        data.createdAt = new Date().toISOString();
+        await window._addDoc(data);
+      }
+      closeModal();
+    } catch (e) {
+      alert("Error saving: " + e.message);
+      setStatus("error", "Save failed");
+    }
+  }
+
+  function askDelete(id) {
+    window._deletingId = id;
+    document.getElementById("confirm-overlay").style.display = "flex";
+  }
+
+  function cancelDelete() {
+    window._deletingId = null;
+    document.getElementById("confirm-overlay").style.display = "none";
+  }
+
+  async function confirmDelete() {
+    if (!window._deletingId) return;
+    setStatus("syncing", "Deleting...");
+    try {
+      await window._deleteDoc(window._deletingId);
+    } catch (e) {
+      alert("Error: " + e.message);
+    }
+    cancelDelete();
+  }
+
+  function downloadPDF(id) {
+    const s = window._solutions.find(s => s.id === id);
+    if (!s) return;
+    const win = window.open("", "_blank");
+    win.document.write(`<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>${s.name} — DIY Cleaning Solution</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;color:#1a2e1c;padding:52px;max-width:720px;margin:0 auto}
+.brand{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#4a7c59;font-weight:700;margin-bottom:14px}
+h1{font-family:'Cormorant Garamond',serif;font-size:36px;color:#1a2e1c;margin-bottom:14px;line-height:1.2}
+.tags{display:flex;gap:10px;margin-bottom:28px}
+.tag{background:#e8f5ec;color:#2d6e3e;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700}
+hr{border:none;border-top:2px solid #e8f5ec;margin-bottom:28px}
+.sec{margin-bottom:26px}
+.sec-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#4a7c59;font-weight:700;margin-bottom:12px}
+.ing-row{display:flex;padding:8px 0;border-bottom:1px solid #f0f9f3;font-size:14px}
+.amt{font-weight:600;color:#2d6e3e;min-width:120px}
+p{font-size:14px;line-height:1.8;color:#3d4e3e}
+.tips{background:#f0f9f3;border-left:4px solid #4a7c59;padding:14px 18px;border-radius:0 8px 8px 0}
+.footer{margin-top:52px;padding-top:14px;border-top:1px solid #e8f5ec;display:flex;justify-content:space-between;font-size:11px;color:#999;letter-spacing:1px;text-transform:uppercase}
+@media print{button{display:none}}
+</style></head>
+<body>
+<div class="brand">🌿 DIY Cleaning Solutions — Private Collection</div>
+<h1>${s.name}</h1>
+<div class="tags"><span class="tag">🏠 ${s.room}</span><span class="tag">&#x2736; ${s.surface}</span></div>
+<hr/>
+<div class="sec">
+  <div class="sec-label">Ingredients</div>
+  ${(s.ingredients||[]).map(i=>`<div class="ing-row"><span class="amt">${i.amount}</span><span>${i.item}</span></div>`).join("")}
+</div>
+<div class="sec">
+  <div class="sec-label">Instructions</div>
+  <p>${s.instructions||""}</p>
+</div>
+${s.tips?`<div class="sec"><div class="sec-label">Tips &amp; Notes</div><div class="tips"><p>${s.tips}</p></div></div>`:""}
+<div class="footer"><span>DIY Cleaning Solutions</span><span>Printed ${new Date().toLocaleDateString()}</span></div>
+<script>window.onload=()=>window.print()<\/script>
+</body></html>`);
+    win.document.close();
+  }
+
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+</script>
+</body>
+</html>
