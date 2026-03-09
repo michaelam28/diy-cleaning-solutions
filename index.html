@@ -333,7 +333,7 @@
           <option>Glass</option><option>Wood</option><option>Tile</option><option>Granite</option><option>Stainless Steel</option><option>Fabric</option><option>Plastic</option><option>Grout</option><option>All Surfaces</option>
         </select>
       </div>
-      <div><label class="field-label">Ingredients</label><div id="ingredients-list"></div><button class="btn-add-ing" onclick="addIngredientRow()">+ Add Ingredient</button></div>
+      <div><label class="field-label">Ingredients</label><textarea class="field-input" id="f-ingredients" placeholder="e.g.&#10;125ml — Oil (olive or coconut)&#10;30ml — White vinegar&#10;5-10 drops — Essential oil" style="min-height:110px;"></textarea></div>
       <div><label class="field-label">Instructions</label><textarea class="field-input" id="f-instructions" placeholder="Step-by-step instructions..."></textarea></div>
       <div><label class="field-label">Tips &amp; Notes</label><textarea class="field-input" id="f-tips" placeholder="Helpful tips, storage, cautions..." style="min-height:70px;"></textarea></div>
       <button class="btn-save" onclick="saveSolution()" id="btn-save">Save Recipe</button>
@@ -404,7 +404,7 @@
       </div>
       <div class="recipe-expand" id="expand-${s.id}" style="display:none;">
         <p class="expand-section-title">Ingredients</p>
-        ${(s.ingredients||[]).map(i=>`<div class="ing-row"><span class="ing-amt">${esc(i.amount)}</span><span class="ing-name">${esc(i.item)}</span></div>`).join("")}
+        <p class="instr-text" style="white-space:pre-line;">${esc(s.ingredients_text||((s.ingredients||[]).map(i=>(i.amount?i.amount+' — ':'')+i.item).join('\n')))}</p>
         <p class="expand-section-title">Instructions</p>
         <p class="instr-text">${esc(s.instructions)}</p>
         ${s.tips?`<p class="expand-section-title">Tips &amp; Notes</p><div class="tips-box">${esc(s.tips)}</div>`:""}
@@ -414,18 +414,39 @@
 
   function toggleRecipe(id){const el=document.getElementById("expand-"+id);if(el)el.style.display=el.style.display==="none"?"block":"none";}
   function esc(str){if(!str)return"";return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
-  function openModal(id){window._editingId=id||null;document.getElementById("modal-title").textContent=id?"Edit Recipe":"New Recipe";document.getElementById("btn-save").textContent=id?"Save Changes":"Save Recipe";if(id){const s=window._solutions.find(s=>s.id===id);if(!s)return;document.getElementById("f-name").value=s.name||"";document.getElementById("f-surface").value=s.surface||"Glass";document.getElementById("f-instructions").value=s.instructions||"";document.getElementById("f-tips").value=s.tips||"";renderIngredients(s.ingredients||[{amount:"",item:""}]);}else{document.getElementById("f-name").value="";document.getElementById("f-surface").value="Glass";document.getElementById("f-instructions").value="";document.getElementById("f-tips").value="";renderIngredients([{amount:"",item:""}]);}document.getElementById("modal-overlay").classList.add("open");}
+  function openModal(id){
+    window._editingId=id||null;
+    document.getElementById("modal-title").textContent=id?"Edit Recipe":"New Recipe";
+    document.getElementById("btn-save").textContent=id?"Save Changes":"Save Recipe";
+    if(id){
+      const s=window._solutions.find(s=>s.id===id);if(!s)return;
+      document.getElementById("f-name").value=s.name||"";
+      document.getElementById("f-surface").value=s.surface||"Glass";
+      document.getElementById("f-ingredients").value=s.ingredients_text||((s.ingredients||[]).map(i=>(i.amount?i.amount+' — ':'')+i.item).join('\n'));
+      document.getElementById("f-instructions").value=s.instructions||"";
+      document.getElementById("f-tips").value=s.tips||"";
+    }else{
+      document.getElementById("f-name").value="";
+      document.getElementById("f-surface").value="Glass";
+      document.getElementById("f-ingredients").value="";
+      document.getElementById("f-instructions").value="";
+      document.getElementById("f-tips").value="";
+    }
+    document.getElementById("modal-overlay").classList.add("open");
+  }
   function closeModal(){document.getElementById("modal-overlay").classList.remove("open");window._editingId=null;}
   function handleOverlayClick(e){if(e.target===document.getElementById("modal-overlay"))closeModal();}
-  function renderIngredients(ings){document.getElementById("ingredients-list").innerHTML=ings.map((ing,i)=>`<div class="ing-row-form"><input class="ing-amt-input" type="text" placeholder="Amount" value="${esc(ing.amount)}"/><input class="ing-item-input" type="text" placeholder="Ingredient" value="${esc(ing.item)}"/>${ings.length>1?`<button class="btn-remove-ing" onclick="removeIngredient(${i})">&#x2715;</button>`:""}</div>`).join("");}
-  function addIngredientRow(){renderIngredients([...getIngredients(),{amount:"",item:""}]);}
-  function removeIngredient(i){const r=getIngredients();r.splice(i,1);renderIngredients(r);}
-  function getIngredients(){return Array.from(document.querySelectorAll("#ingredients-list .ing-row-form")).map(row=>{const inp=row.querySelectorAll("input");return{amount:inp[0].value,item:inp[1].value};});}
-  async function saveSolution(){const name=document.getElementById("f-name").value.trim();if(!name){alert("Please enter a recipe name.");return;}const data={name,room:window._currentRoom,surface:document.getElementById("f-surface").value,ingredients:getIngredients().filter(i=>i.item.trim()),instructions:document.getElementById("f-instructions").value.trim(),tips:document.getElementById("f-tips").value.trim(),updatedAt:new Date().toISOString()};setStatus("syncing","Saving...");try{if(window._editingId){await window._updateDoc(window._editingId,data);}else{data.createdAt=new Date().toISOString();await window._addDoc(data);}closeModal();}catch(e){alert("Error: "+e.message);setStatus("error","Save failed");}}
+  async function saveSolution(){
+    const name=document.getElementById("f-name").value.trim();
+    if(!name){alert("Please enter a recipe name.");return;}
+    const data={name,room:window._currentRoom,surface:document.getElementById("f-surface").value,ingredients_text:document.getElementById("f-ingredients").value.trim(),instructions:document.getElementById("f-instructions").value.trim(),tips:document.getElementById("f-tips").value.trim(),updatedAt:new Date().toISOString()};
+    try{if(window._editingId){await window._updateDoc(window._editingId,data);}else{data.createdAt=new Date().toISOString();await window._addDoc(data);}closeModal();}
+    catch(e){alert("Error: "+e.message);}
+  }
   function askDelete(id){window._deletingId=id;document.getElementById("confirm-overlay").style.display="flex";}
   function cancelDelete(){window._deletingId=null;document.getElementById("confirm-overlay").style.display="none";}
-  async function confirmDelete(){if(!window._deletingId)return;setStatus("syncing","Deleting...");try{await window._deleteDoc(window._deletingId);}catch(e){alert("Error: "+e.message);}cancelDelete();}
-  function downloadPDF(id){const s=window._solutions.find(s=>s.id===id);if(!s)return;const win=window.open("","_blank");win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+s.name+'</title><link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet"/><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Nunito,sans-serif;color:#2c3e2d;padding:50px;max-width:700px;margin:0 auto}.brand{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#4a7c59;font-weight:800;margin-bottom:14px}h1{font-family:"Fredoka One",cursive;font-size:34px;color:#2d5a3d;margin-bottom:12px}.tags{display:flex;gap:10px;margin-bottom:24px}.tag{background:#e8f5ec;color:#2d6e3e;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:800}hr{border:none;border-top:2px solid #e8f5ec;margin-bottom:24px}.sec{margin-bottom:22px}.sec-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#4a7c59;font-weight:800;margin-bottom:10px}.ing-row{display:flex;padding:7px 0;border-bottom:1px solid #f0f9f0;font-size:14px}.amt{font-weight:700;color:#2d5a3d;min-width:120px}p{font-size:14px;line-height:1.8;color:#3d4e3e}.tips{background:#f0f9f3;border-left:4px solid #4a7c59;padding:14px 18px;border-radius:0 10px 10px 0}.footer{margin-top:48px;padding-top:14px;border-top:1px solid #e8f5ec;display:flex;justify-content:space-between;font-size:11px;color:#999;text-transform:uppercase}@media print{button{display:none}}</style></head><body><div class="brand">&#x1F9F9; DIY Cleaning Solutions &mdash; Private</div><h1>'+s.name+'</h1><div class="tags"><span class="tag">&#x1F3E0; '+s.room+'</span><span class="tag">&#x2736; '+s.surface+'</span></div><hr/><div class="sec"><div class="sec-label">Ingredients</div>'+(s.ingredients||[]).map(i=>'<div class="ing-row"><span class="amt">'+i.amount+'</span><span>'+i.item+'</span></div>').join('')+'</div><div class="sec"><div class="sec-label">Instructions</div><p>'+(s.instructions||'')+'</p></div>'+(s.tips?'<div class="sec"><div class="sec-label">Tips &amp; Notes</div><div class="tips"><p>'+s.tips+'</p></div></div>':'')+'<div class="footer"><span>DIY Cleaning Solutions</span><span>Printed '+new Date().toLocaleDateString()+'</span></div><script>window.onload=()=>window.print()<\/script></body></html>');win.document.close();}
+  async function confirmDelete(){if(!window._deletingId)return;try{await window._deleteDoc(window._deletingId);}catch(e){alert("Error: "+e.message);}cancelDelete();}
+  function downloadPDF(id){const s=window._solutions.find(s=>s.id===id);if(!s)return;const win=window.open("","_blank");const ings=s.ingredients_text||((s.ingredients||[]).map(i=>(i.amount?i.amount+' — ':'')+i.item).join('\n'));win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+s.name+'</title><link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet"/><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Nunito,sans-serif;color:#2c3e2d;padding:50px;max-width:700px;margin:0 auto}.brand{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#4a7c59;font-weight:800;margin-bottom:14px}h1{font-family:"Fredoka One",cursive;font-size:34px;color:#2d5a3d;margin-bottom:12px}.tags{display:flex;gap:10px;margin-bottom:24px}.tag{background:#e8f5ec;color:#2d6e3e;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:800}hr{border:none;border-top:2px solid #e8f5ec;margin-bottom:24px}.sec{margin-bottom:22px}.sec-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#4a7c59;font-weight:800;margin-bottom:10px}p{font-size:14px;line-height:1.8;color:#3d4e3e;white-space:pre-line}.tips{background:#f0f9f3;border-left:4px solid #4a7c59;padding:14px 18px;border-radius:0 10px 10px 0}.footer{margin-top:48px;padding-top:14px;border-top:1px solid #e8f5ec;display:flex;justify-content:space-between;font-size:11px;color:#999;text-transform:uppercase}@media print{button{display:none}}</style></head><body><div class="brand">Your Cleaning Solutions</div><h1>'+s.name+'</h1><div class="tags"><span class="tag">'+s.room+'</span><span class="tag">'+s.surface+'</span></div><hr/><div class="sec"><div class="sec-label">Ingredients</div><p>'+ings+'</p></div><div class="sec"><div class="sec-label">Instructions</div><p>'+(s.instructions||'')+'</p></div>'+(s.tips?'<div class="sec"><div class="sec-label">Tips &amp; Notes</div><div class="tips"><p>'+s.tips+'</p></div></div>':'')+'<div class="footer"><span>Your Cleaning Solutions</span><span>Printed '+new Date().toLocaleDateString()+'</span></div><script>window.onload=()=>window.print()<\/script></body></html>');win.document.close();}
   document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal();});
 </script>
 </body>
