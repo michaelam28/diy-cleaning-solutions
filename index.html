@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DIY Cleaning Solutions</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root { --cream:#fffdf4;--warm:#fff8e7;--green:#4a7c59;--green-dark:#2d5a3d;--green-light:#e8f5ec;--text:#2c3e2d;--text-muted:#7a8c7b;--border:#e0ede2;--white:#ffffff; }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Nunito',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;}
+    .page{display:none;min-height:100vh;}.page.active{display:block;animation:fadeIn 0.35s ease;}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .home-header{background:linear-gradient(160deg,#2d5a3d 0%,#4a7c59 50%,#6aaa7a 100%);padding:48px 24px 36px;text-align:center;position:relative;overflow:hidden;}
+    .home-header-inner{position:relative;z-index:1;}
+    .home-logo{font-size:44px;margin-bottom:10px;display:block;animation:bounce 2.5s infinite;}
+    @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+    .home-title{font-family:'Fredoka One',cursive;font-size:clamp(28px,7vw,50px);color:#fff;line-height:1.1;margin-bottom:8px;text-shadow:0 2px 12px rgba(0,0,0,.15);}
+    .home-subtitle{color:rgba(255,255,255,.8);font-size:15px;font-weight:500;}
+    .home-content{max-width:680px;margin:0 auto;padding:28px 20px 40px;}
+    .room-cards{display:flex;flex-direction:column;gap:20px;}
+    .room-card{background:var(--white);border-radius:24px;overflow:hidden;box-shadow:0 8px 32px rgba(44,62,45,.13);cursor:pointer;border:2px solid transparent;transition:transform .25s,box-shadow .25s,border-color .2s;position:relative;}
+    .room-card:hover{transform:translateY(-4px) scale(1.01);box-shadow:0 16px 48px rgba(44,62,45,.2);border-color:var(--green);}
+    .room-img-wrap{position:relative;display:block;}
+    .room-illustration{width:100%;height:200px;display:block;}
+    .room-img-title{position:absolute;top:0;left:0;right:0;padding:16px 20px;background:linear-gradient(rgba(28,50,30,.55),transparent);display:flex;align-items:center;justify-content:space-between;}
+    .room-card-name{font-family:'Fredoka One',cursive;font-size:26px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.3);}
+    .room-card-arrow{width:36px;height:36px;background:rgba(255,255,255,.25);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.4);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:bold;}
+    .room-card-count{font-size:12px;color:rgba(255,255,255,.85);font-weight:700;padding:3px 10px;background:rgba(0,0,0,.25);border-radius:20px;backdrop-filter:blur(4px);}
+    .room-header{position:relative;overflow:hidden;}
+    .room-header-img{width:100%;height:220px;display:block;}
+    .room-header-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(28,50,30,.85));padding:20px 24px 18px;}
+    .back-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.2);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:6px 14px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:10px;font-family:inherit;}
+    .room-page-title{font-family:'Fredoka One',cursive;font-size:32px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.2);}
+    .room-content{max-width:680px;margin:0 auto;padding:24px 20px 40px;}
+    .room-controls{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+    .search-wrap{position:relative;flex:1;min-width:180px;}
+    .search-wrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--green);pointer-events:none;}
+    .search-box{width:100%;padding:10px 14px 10px 38px;border:2px solid var(--border);border-radius:12px;font-size:14px;font-family:inherit;background:var(--white);color:var(--text);outline:none;}
+    .search-box:focus{border-color:var(--green);}
+    .btn-add-recipe{display:flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--green),var(--green-dark));color:#fff;border:none;border-radius:12px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;}
+    .recipes-list{display:flex;flex-direction:column;gap:14px;}
+    .recipe-card{background:var(--white);border-radius:18px;border:2px solid var(--border);overflow:hidden;transition:box-shadow .2s,transform .2s;}
+    .recipe-card:hover{box-shadow:0 6px 24px rgba(44,62,45,.1);transform:translateY(-2px);}
+    .recipe-card-top{padding:18px 18px 0;cursor:pointer;}
+    .recipe-name{font-family:'Fredoka One',cursive;font-size:20px;color:var(--green-dark);margin-bottom:8px;line-height:1.2;}
+    .recipe-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+    .recipe-tag{padding:3px 12px;border-radius:20px;font-size:12px;font-weight:700;background:#e8f5ec;color:var(--green);}
+    .recipe-card-actions{display:flex;gap:6px;justify-content:flex-end;padding:0 14px 14px;}
+    .btn-sm{display:flex;align-items:center;gap:4px;border:none;border-radius:10px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;}
+    .btn-pdf{background:#e8f5ec;color:var(--green);}.btn-edit{background:#f0f0f0;color:#555;}.btn-del{background:#fef2f2;color:#dc2626;}
+    .recipe-expand{padding:0 18px 18px;border-top:2px solid var(--green-light);}
+    .expand-section-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--green);font-weight:800;margin:14px 0 8px;}
+    .ing-row{display:flex;padding:6px 0;border-bottom:1px solid #f5faf5;font-size:14px;}
+    .ing-amt{font-weight:700;color:var(--green-dark);min-width:110px;}.ing-name{color:var(--text-muted);}
+    .instr-text{font-size:14px;line-height:1.8;color:#445544;}
+    .tips-box{background:var(--green-light);border-left:4px solid var(--green);padding:12px 16px;border-radius:0 10px 10px 0;font-size:14px;line-height:1.7;color:#3a5c3a;margin-top:4px;}
+    .empty-room{text-align:center;padding:60px 20px;}.empty-room .icon{font-size:48px;margin-bottom:14px;}
+    .empty-room h3{font-family:'Fredoka One',cursive;font-size:22px;color:var(--green-dark);margin-bottom:6px;}
+    .empty-room p{color:var(--text-muted);font-size:14px;}
+    .dot{display:none;}
+    .sync-bar{display:none;}
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s;}
+    .overlay.open{opacity:1;pointer-events:all;}
+    .modal{background:var(--white);border-radius:24px;width:100%;max-width:540px;max-height:92vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.25);transform:translateY(20px);transition:transform .2s;}
+    .overlay.open .modal{transform:translateY(0);}
+    .modal-header{position:sticky;top:0;background:var(--white);padding:20px 24px 14px;border-bottom:2px solid var(--border);display:flex;justify-content:space-between;align-items:center;z-index:1;border-radius:24px 24px 0 0;}
+    .modal-header h2{font-family:'Fredoka One',cursive;font-size:24px;color:var(--green-dark);}
+    .btn-close{background:none;border:none;cursor:pointer;color:#999;font-size:22px;padding:2px 6px;line-height:1;}
+    .modal-body{padding:20px 24px;display:flex;flex-direction:column;gap:14px;}
+    .field-label{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);font-weight:800;display:block;margin-bottom:6px;}
+    .field-input{width:100%;padding:10px 14px;border-radius:12px;border:2px solid var(--border);font-size:14px;color:var(--text);background:var(--warm);font-family:inherit;outline:none;}
+    .field-input:focus{border-color:var(--green);}
+    textarea.field-input{resize:vertical;min-height:85px;}
+    .ing-row-form{display:flex;gap:8px;margin-bottom:8px;}
+    .ing-amt-input{width:120px;flex-shrink:0;padding:10px 12px;border-radius:12px;border:2px solid var(--border);font-size:14px;background:var(--warm);font-family:inherit;outline:none;}
+    .ing-item-input{flex:1;padding:10px 12px;border-radius:12px;border:2px solid var(--border);font-size:14px;background:var(--warm);font-family:inherit;outline:none;}
+    .btn-remove-ing{background:#fef2f2;border:none;border-radius:10px;padding:0 12px;color:#dc2626;cursor:pointer;font-size:16px;flex-shrink:0;}
+    .btn-add-ing{width:100%;background:none;border:2px dashed var(--green);border-radius:12px;padding:9px;color:var(--green);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px;}
+    .btn-add-ing:hover{background:var(--green-light);}
+    .btn-save{width:100%;background:linear-gradient(135deg,var(--green),var(--green-dark));color:#fff;border:none;border-radius:14px;padding:14px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;}
+    .confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;}
+    .confirm-box{background:#fff;border-radius:20px;padding:28px;max-width:340px;width:100%;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.2);}
+    .confirm-box h3{font-family:'Fredoka One',cursive;font-size:22px;margin-bottom:8px;color:var(--green-dark);}
+    .confirm-box p{font-size:14px;color:var(--text-muted);margin-bottom:20px;}
+    .confirm-btns{display:flex;gap:10px;}
+    .btn-cancel{flex:1;padding:11px;border-radius:12px;border:2px solid var(--border);background:#fff;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;color:var(--text-muted);}
+    .btn-confirm-del{flex:1;padding:11px;border-radius:12px;border:none;background:#dc2626;color:#fff;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;}
+    ::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-thumb{background:#a8d5b5;border-radius:3px;}
+  </style>
+</head>
+<body>
+<div class="sync-bar"><span class="dot syncing" id="sync-dot"></span><span id="sync-text">Connecting...</span></div>
+
+<div class="page active" id="page-home">
+  <div class="home-header"><div class="home-header-inner">
+    <span class="home-logo">🧹</span>
+    <h1 class="home-title">Your Cleaning Solutions</h1>
+  </div></div>
+  <div class="home-content">
+    <div class="room-cards">
+
+      <div class="room-card" onclick="goToRoom('Kitchen')">
+        <svg class="room-illustration" viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg">
+          <rect width="600" height="200" fill="#fff8e7"/><rect width="600" height="145" fill="#fdebc8"/>
+          <rect y="145" width="600" height="55" fill="#d4956a"/>
+          <line x1="0" y1="162" x2="600" y2="162" stroke="#c4855a" stroke-width="1.5"/>
+          <rect x="20" y="90" width="560" height="55" rx="4" fill="#c0784a"/>
+          <rect x="20" y="90" width="560" height="8" rx="2" fill="#b06838"/>
+          <rect x="28" y="102" width="80" height="38" rx="3" fill="#d08848" stroke="#b06838" stroke-width="1.5"/>
+          <rect x="116" y="102" width="80" height="38" rx="3" fill="#d08848" stroke="#b06838" stroke-width="1.5"/>
+          <rect x="204" y="102" width="80" height="38" rx="3" fill="#d08848" stroke="#b06838" stroke-width="1.5"/>
+          <rect x="292" y="102" width="80" height="38" rx="3" fill="#d08848" stroke="#b06838" stroke-width="1.5"/>
+          <rect x="380" y="102" width="80" height="38" rx="3" fill="#d08848" stroke="#b06838" stroke-width="1.5"/>
+          <rect x="468" y="102" width="110" height="38" rx="3" fill="#d08848" stroke="#b06838" stroke-width="1.5"/>
+          <circle cx="68" cy="121" r="4" fill="#888"/><circle cx="156" cy="121" r="4" fill="#888"/>
+          <circle cx="244" cy="121" r="4" fill="#888"/><circle cx="332" cy="121" r="4" fill="#888"/>
+          <circle cx="420" cy="121" r="4" fill="#888"/><circle cx="523" cy="121" r="4" fill="#888"/>
+          <rect x="18" y="85" width="564" height="10" rx="3" fill="#e8e8e8"/>
+          <rect x="240" y="70" width="120" height="20" rx="3" fill="#ccc"/>
+          <rect x="248" y="73" width="104" height="14" rx="2" fill="#aaa"/>
+          <ellipse cx="300" cy="66" rx="8" ry="14" fill="#999"/>
+          <rect x="380" y="72" width="80" height="18" rx="2" fill="#555"/>
+          <circle cx="400" cy="80" r="8" fill="#444" stroke="#666" stroke-width="1.5"/>
+          <circle cx="440" cy="80" r="8" fill="#444" stroke="#666" stroke-width="1.5"/>
+          <circle cx="400" cy="80" r="4" fill="#c0392b"/><circle cx="440" cy="80" r="4" fill="#c0392b"/>
+          <rect x="20" y="10" width="200" height="55" rx="4" fill="#c0784a"/>
+          <rect x="28" y="14" width="88" height="45" rx="3" fill="#d08848" stroke="#b06838" stroke-width="1.5"/>
+          <rect x="124" y="14" width="88" height="45" rx="3" fill="#d08848" stroke="#b06838" stroke-width="1.5"/>
+          <circle cx="72" cy="37" r="4" fill="#888"/><circle cx="168" cy="37" r="4" fill="#888"/>
+          <rect x="390" y="8" width="100" height="70" rx="4" fill="#b8e4f9" stroke="#8cb8d4" stroke-width="2"/>
+          <line x1="440" y1="8" x2="440" y2="78" stroke="#8cb8d4" stroke-width="1.5"/>
+          <line x1="390" y1="43" x2="490" y2="43" stroke="#8cb8d4" stroke-width="1.5"/>
+          <circle cx="415" cy="28" r="10" fill="#ffd700" opacity="0.7"/>
+          <ellipse cx="320" cy="82" rx="18" ry="14" fill="#e05a5a"/>
+          <rect x="316" y="66" width="8" height="10" rx="4" fill="#c04040"/>
+          <ellipse cx="160" cy="88" rx="28" ry="8" fill="#c78f5a"/>
+          <circle cx="148" cy="82" r="9" fill="#e8845a"/>
+          <circle cx="162" cy="80" r="10" fill="#5cb85c"/>
+          <circle cx="174" cy="82" r="8" fill="#ffd700"/>
+          <rect x="510" y="55" width="12" height="30" rx="3" fill="#8B6914"/>
+          <ellipse cx="516" cy="50" rx="20" ry="18" fill="#5cb85c"/>
+          <rect x="100" y="120" width="24" height="30" rx="2" fill="#e84393" opacity="0.8"/>
+        </svg>
+        <div class="room-img-title">
+          <div class="room-card-name">Kitchen</div>
+          <div class="room-card-count" id="count-Kitchen">0 recipes</div>
+        </div>
+      </div>
+
+      <div class="room-card" onclick="goToRoom('Bathroom')">
+        <svg class="room-illustration" viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg">
+          <rect width="600" height="200" fill="#e8f4fa"/><rect width="600" height="145" fill="#d4ecf7"/>
+          <g stroke="#b8d8ea" stroke-width="1" fill="none">
+            <line x1="0" y1="30" x2="600" y2="30"/><line x1="0" y1="60" x2="600" y2="60"/><line x1="0" y1="90" x2="600" y2="90"/><line x1="0" y1="120" x2="600" y2="120"/>
+            <line x1="60" y1="0" x2="60" y2="145"/><line x1="120" y1="0" x2="120" y2="145"/><line x1="180" y1="0" x2="180" y2="145"/><line x1="240" y1="0" x2="240" y2="145"/>
+            <line x1="300" y1="0" x2="300" y2="145"/><line x1="360" y1="0" x2="360" y2="145"/><line x1="420" y1="0" x2="420" y2="145"/><line x1="480" y1="0" x2="480" y2="145"/><line x1="540" y1="0" x2="540" y2="145"/>
+          </g>
+          <rect y="145" width="600" height="55" fill="#c8dde8"/>
+          <rect x="20" y="95" width="200" height="55" rx="20" fill="#fff" stroke="#b0ccd8" stroke-width="2"/>
+          <rect x="30" y="105" width="180" height="40" rx="15" fill="#e8f8ff"/>
+          <rect x="108" y="88" width="8" height="14" rx="4" fill="#aaa"/><rect x="96" y="84" width="32" height="8" rx="4" fill="#bbb"/>
+          <circle cx="80" cy="120" r="8" fill="white" opacity="0.7"/><circle cx="100" cy="115" r="6" fill="white" opacity="0.6"/>
+          <circle cx="140" cy="118" r="9" fill="white" opacity="0.7"/><circle cx="170" cy="113" r="7" fill="white" opacity="0.6"/>
+          <rect x="260" y="95" width="100" height="55" rx="8" fill="#fff" stroke="#b0ccd8" stroke-width="2"/>
+          <ellipse cx="310" cy="135" rx="38" ry="12" fill="#e0f0f8"/>
+          <rect x="305" y="88" width="10" height="14" rx="5" fill="#aaa"/><rect x="295" y="85" width="30" height="8" rx="4" fill="#bbb"/>
+          <rect x="260" y="10" width="100" height="65" rx="6" fill="#ddf0fa" stroke="#b0ccd8" stroke-width="2"/>
+          <line x1="275" y1="20" x2="290" y2="60" stroke="white" stroke-width="3" opacity="0.5"/>
+          <ellipse cx="480" cy="138" rx="52" ry="18" fill="#fff" stroke="#b0ccd8" stroke-width="2"/>
+          <rect x="445" y="95" width="70" height="48" rx="8" fill="#f0f8ff" stroke="#b0ccd8" stroke-width="2"/>
+          <rect x="438" y="88" width="84" height="14" rx="6" fill="#e0eef8" stroke="#b0ccd8" stroke-width="2"/>
+          <rect x="370" y="90" width="28" height="50" rx="8" fill="#5b9bd5"/>
+          <rect x="376" y="82" width="16" height="12" rx="4" fill="#4a8ac4"/>
+          <rect x="530" y="40" width="8" height="80" rx="4" fill="#aaa"/>
+          <rect x="534" y="50" width="40" height="28" rx="3" fill="#5b9bd5" opacity="0.9"/>
+          <rect x="534" y="82" width="40" height="28" rx="3" fill="#e8845a" opacity="0.9"/>
+          <rect x="60" y="68" width="10" height="28" rx="3" fill="#8B6914"/>
+          <ellipse cx="65" cy="62" rx="16" ry="14" fill="#5cb85c"/>
+        </svg>
+        <div class="room-img-title">
+          <div class="room-card-name">Bathroom</div>
+          <div class="room-card-count" id="count-Bathroom">0 recipes</div>
+        </div>
+      </div>
+
+      <div class="room-card" onclick="goToRoom('Bedroom')">
+        <svg class="room-illustration" viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg">
+          <rect width="600" height="200" fill="#fdf0f8"/><rect width="600" height="145" fill="#f5e0f0"/>
+          <g fill="#e8c8e0" opacity="0.5">
+            <circle cx="40" cy="25" r="4"/><circle cx="100" cy="50" r="4"/><circle cx="160" cy="20" r="4"/><circle cx="220" cy="45" r="4"/>
+            <circle cx="280" cy="25" r="4"/><circle cx="340" cy="50" r="4"/><circle cx="400" cy="20" r="4"/><circle cx="460" cy="45" r="4"/>
+            <circle cx="520" cy="25" r="4"/><circle cx="70" cy="70" r="4"/><circle cx="130" cy="90" r="4"/>
+          </g>
+          <rect y="145" width="600" height="55" fill="#c4956a"/>
+          <ellipse cx="250" cy="160" rx="140" ry="30" fill="#c97db5" opacity="0.35"/>
+          <rect x="80" y="80" width="300" height="70" rx="8" fill="#c0784a"/>
+          <rect x="88" y="88" width="284" height="56" rx="6" fill="#fff8f0"/>
+          <rect x="96" y="92" width="90" height="44" rx="8" fill="#fff" stroke="#e8c8d8" stroke-width="2"/>
+          <rect x="194" y="92" width="90" height="44" rx="8" fill="#fff" stroke="#e8c8d8" stroke-width="2"/>
+          <rect x="88" y="115" width="284" height="30" rx="6" fill="#c97db5" opacity="0.7"/>
+          <rect x="75" y="55" width="310" height="32" rx="10" fill="#a05a2a"/>
+          <rect x="20" y="100" width="55" height="50" rx="6" fill="#c0784a"/>
+          <rect x="25" y="106" width="45" height="38" rx="4" fill="#d08848"/>
+          <circle cx="47" cy="125" r="4" fill="#888"/>
+          <rect x="40" y="72" width="8" height="28" rx="3" fill="#bbb"/>
+          <ellipse cx="44" cy="68" rx="20" ry="12" fill="#ffd97a" opacity="0.9"/>
+          <rect x="385" y="100" width="55" height="50" rx="6" fill="#c0784a"/>
+          <rect x="390" y="106" width="45" height="38" rx="4" fill="#d08848"/>
+          <rect x="460" y="30" width="120" height="120" rx="6" fill="#c0784a"/>
+          <rect x="466" y="36" width="50" height="108" rx="4" fill="#d08848" stroke="#b06838" stroke-width="1.5"/>
+          <rect x="522" y="36" width="52" height="108" rx="4" fill="#d08848" stroke="#b06838" stroke-width="1.5"/>
+          <circle cx="492" cy="92" r="5" fill="#888"/><circle cx="547" cy="92" r="5" fill="#888"/>
+          <rect x="473" y="44" width="36" height="52" rx="3" fill="#d4ecf7" stroke="#b0ccd8" stroke-width="1.5"/>
+          <rect x="20" y="10" width="120" height="80" rx="4" fill="#87ceeb" stroke="#6baed6" stroke-width="2"/>
+          <line x1="80" y1="10" x2="80" y2="90" stroke="#6baed6" stroke-width="1.5"/>
+          <line x1="20" y1="50" x2="140" y2="50" stroke="#6baed6" stroke-width="1.5"/>
+          <path d="M20 10 Q35 50 20 90" fill="#c97db5" opacity="0.6"/>
+          <path d="M140 10 Q125 50 140 90" fill="#c97db5" opacity="0.6"/>
+          <rect x="15" y="8" width="130" height="5" rx="2.5" fill="#888"/>
+        </svg>
+        <div class="room-img-title">
+          <div class="room-card-name">Bedroom</div>
+          <div class="room-card-count" id="count-Bedroom">0 recipes</div>
+        </div>
+      </div>
+
+      <div class="room-card" onclick="goToRoom('Living Room')">
+        <svg class="room-illustration" viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg">
+          <rect width="600" height="200" fill="#fdf6ec"/>
+          <rect width="600" height="145" fill="#f5ede0"/>
+          <g fill="#e8d8c0" opacity="0.4"><circle cx="50" cy="20" r="5"/><circle cx="150" cy="40" r="4"/><circle cx="250" cy="18" r="5"/><circle cx="350" cy="38" r="4"/><circle cx="450" cy="20" r="5"/><circle cx="550" cy="40" r="4"/><circle cx="100" cy="65" r="4"/><circle cx="200" cy="80" r="5"/><circle cx="300" cy="62" r="4"/><circle cx="400" cy="78" r="5"/><circle cx="500" cy="65" r="4"/></g>
+          <rect y="145" width="600" height="55" fill="#c8a878"/>
+          <line x1="0" y1="162" x2="600" y2="162" stroke="#b89868" stroke-width="1.5"/>
+          <line x1="0" y1="179" x2="600" y2="179" stroke="#b89868" stroke-width="1.5"/>
+          <ellipse cx="280" cy="158" rx="160" ry="22" fill="#c8956a" opacity="0.4"/>
+          <!-- Sofa -->
+          <rect x="60" y="95" width="260" height="55" rx="12" fill="#8b6f47"/>
+          <rect x="60" y="95" width="260" height="18" rx="10" fill="#a07848"/>
+          <rect x="68" y="113" width="72" height="32" rx="8" fill="#9a7040"/>
+          <rect x="148" y="113" width="72" height="32" rx="8" fill="#9a7040"/>
+          <rect x="228" y="113" width="72" height="32" rx="8" fill="#9a7040"/>
+          <rect x="60" y="105" width="18" height="45" rx="6" fill="#7a5f37"/>
+          <rect x="302" y="105" width="18" height="45" rx="6" fill="#7a5f37"/>
+          <!-- Cushions on sofa -->
+          <rect x="78" y="116" width="54" height="24" rx="6" fill="#e8845a" opacity="0.85"/>
+          <rect x="158" y="116" width="54" height="24" rx="6" fill="#5b9bd5" opacity="0.85"/>
+          <rect x="238" y="116" width="54" height="24" rx="6" fill="#c97db5" opacity="0.85"/>
+          <!-- Coffee table -->
+          <rect x="120" y="148" width="140" height="8" rx="3" fill="#a07848"/>
+          <rect x="130" y="156" width="6" height="12" rx="2" fill="#8b6430"/>
+          <rect x="248" y="156" width="6" height="12" rx="2" fill="#8b6430"/>
+          <!-- Book on table -->
+          <rect x="155" y="142" width="30" height="8" rx="2" fill="#e8845a"/>
+          <!-- Plant pot on table -->
+          <rect x="200" y="138" width="16" height="12" rx="3" fill="#c0784a"/>
+          <ellipse cx="208" cy="132" rx="14" ry="12" fill="#5cb85c"/>
+          <ellipse cx="200" cy="136" rx="10" ry="9" fill="#4a9a4a"/>
+          <!-- TV unit -->
+          <rect x="380" y="95" width="180" height="55" rx="6" fill="#7a5f37"/>
+          <rect x="388" y="102" width="164" height="38" rx="4" fill="#1a1a2e"/>
+          <rect x="392" y="106" width="156" height="30" rx="3" fill="#2a2a4e"/>
+          <!-- TV screen glow -->
+          <rect x="394" y="108" width="152" height="26" rx="2" fill="#3a4a8a" opacity="0.6"/>
+          <line x1="470" y1="108" x2="430" y2="134" stroke="#5a7aaa" stroke-width="1" opacity="0.4"/>
+          <!-- TV legs -->
+          <rect x="430" y="150" width="8" height="14" rx="2" fill="#6a4f27"/>
+          <rect x="510" y="150" width="8" height="14" rx="2" fill="#6a4f27"/>
+          <!-- Window -->
+          <rect x="20" y="10" width="110" height="80" rx="4" fill="#b8ddf9" stroke="#8cb8d4" stroke-width="2"/>
+          <line x1="75" y1="10" x2="75" y2="90" stroke="#8cb8d4" stroke-width="1.5"/>
+          <line x1="20" y1="50" x2="130" y2="50" stroke="#8cb8d4" stroke-width="1.5"/>
+          <path d="M20 10 Q34 50 20 90" fill="#e8c87a" opacity="0.4"/>
+          <path d="M130 10 Q116 50 130 90" fill="#e8c87a" opacity="0.4"/>
+          <rect x="15" y="8" width="120" height="5" rx="2.5" fill="#888"/>
+          <!-- Floor lamp -->
+          <rect x="355" y="30" width="6" height="115" rx="3" fill="#aaa"/>
+          <ellipse cx="358" cy="28" rx="22" ry="14" fill="#ffd97a" opacity="0.85"/>
+          <ellipse cx="358" cy="28" rx="22" ry="6" fill="#ffe8a0" opacity="0.6"/>
+          <ellipse cx="358" cy="145" rx="14" ry="5" fill="#999"/>
+          <!-- Bookshelf -->
+          <rect x="540" y="20" width="55" height="120" rx="4" fill="#a07848"/>
+          <rect x="545" y="26" width="45" height="22" rx="2" fill="#8b6430"/>
+          <rect x="545" y="52" width="45" height="22" rx="2" fill="#8b6430"/>
+          <rect x="545" y="78" width="45" height="22" rx="2" fill="#8b6430"/>
+          <rect x="547" y="28" width="10" height="18" rx="1" fill="#e05a5a"/>
+          <rect x="559" y="28" width="8" height="18" rx="1" fill="#5b9bd5"/>
+          <rect x="569" y="28" width="10" height="18" rx="1" fill="#5cb85c"/>
+          <rect x="547" y="54" width="12" height="18" rx="1" fill="#ffd700"/>
+          <rect x="561" y="54" width="8" height="18" rx="1" fill="#c97db5"/>
+          <rect x="547" y="80" width="9" height="18" rx="1" fill="#e8845a"/>
+          <rect x="558" y="80" width="11" height="18" rx="1" fill="#5b9bd5"/>
+        </svg>
+        <div class="room-img-title">
+          <div class="room-card-name">Living Room</div>
+          <div class="room-card-count" id="count-Living Room">0 recipes</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="page" id="page-room">
+  <div class="room-header">
+    <svg id="room-header-img" class="room-header-img" viewBox="0 0 600 220" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div class="room-header-overlay">
+      <button class="back-btn" onclick="goHome()">&#8249; Back</button>
+      <div class="room-page-title" id="room-page-title">Kitchen</div>
+    </div>
+  </div>
+  <div class="room-content">
+    <div class="room-controls">
+      <div class="search-wrap">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" class="search-box" id="recipe-search" placeholder="Search recipes..." oninput="renderRecipes()"/>
+      </div>
+      <button class="btn-add-recipe" onclick="openModal()">+ Add Recipe</button>
+    </div>
+    <div id="recipes-list" class="recipes-list"></div>
+    <div id="room-empty" class="empty-room" style="display:none;"><div class="icon">&#x1F33F;</div><h3>No recipes yet!</h3><p>Tap Add Recipe to save your first cleaning recipe here.</p></div>
+    <div id="room-no-results" class="empty-room" style="display:none;"><div class="icon">&#x1F50D;</div><h3>No results found</h3><p>Try a different search term.</p></div>
+  </div>
+</div>
+
+<div class="overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal">
+    <div class="modal-header"><h2 id="modal-title">New Recipe</h2><button class="btn-close" onclick="closeModal()">&#x2715;</button></div>
+    <div class="modal-body">
+      <div><label class="field-label">Recipe Name</label><input type="text" class="field-input" id="f-name" placeholder="e.g. All-Purpose Kitchen Cleaner"/></div>
+      <div><label class="field-label">Surface Type</label>
+        <select class="field-input" id="f-surface">
+          <option>Glass</option><option>Wood</option><option>Tile</option><option>Granite</option><option>Stainless Steel</option><option>Fabric</option><option>Plastic</option><option>Grout</option><option>All Surfaces</option>
+        </select>
+      </div>
+      <div><label class="field-label">Ingredients</label><textarea class="field-input" id="f-ingredients" placeholder="e.g.&#10;125ml — Oil (olive or coconut)&#10;30ml — White vinegar&#10;5-10 drops — Essential oil" style="min-height:110px;"></textarea></div>
+      <div><label class="field-label">Instructions</label><textarea class="field-input" id="f-instructions" placeholder="Step-by-step instructions..."></textarea></div>
+      <div><label class="field-label">Tips &amp; Notes</label><textarea class="field-input" id="f-tips" placeholder="Helpful tips, storage, cautions..." style="min-height:70px;"></textarea></div>
+      <button class="btn-save" onclick="saveSolution()" id="btn-save">Save Recipe</button>
+    </div>
+  </div>
+</div>
+
+<div id="confirm-overlay" class="confirm-overlay" style="display:none;">
+  <div class="confirm-box">
+    <h3>Delete Recipe?</h3><p>This will permanently remove this recipe.</p>
+    <div class="confirm-btns">
+      <button class="btn-cancel" onclick="cancelDelete()">Cancel</button>
+      <button class="btn-confirm-del" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+  const app = initializeApp({apiKey:"AIzaSyALrmfjfEhouI6_F1O7gesBL6Kr0kObc0g",authDomain:"cleanitfixitbuffit.firebaseapp.com",projectId:"cleanitfixitbuffit",storageBucket:"cleanitfixitbuffit.firebasestorage.app",messagingSenderId:"777948154134",appId:"1:777948154134:web:4636e2778282ace273e837"});
+  const db = getFirestore(app);
+  const colRef = collection(db,"solutions");
+  window._addDoc = async(data)=>await addDoc(colRef,data);
+  window._updateDoc = async(id,data)=>await updateDoc(doc(db,"solutions",id),data);
+  window._deleteDoc = async(id)=>await deleteDoc(doc(db,"solutions",id));
+  let _firstLoad = true;
+  onSnapshot(colRef,(snapshot)=>{
+    window._solutions=[];
+    snapshot.forEach(d=>window._solutions.push({id:d.id,...d.data()}));
+    updateCounts();renderRecipes();
+  },(err)=>{console.error(err);});
+</script>
+
+<script>
+  window._solutions=[];window._currentRoom="Kitchen";window._editingId=null;window._deletingId=null;
+
+  const KITCHEN_SVG = '<rect width="600" height="220" fill="#fff8e7"/><rect width="600" height="160" fill="#fdebc8"/><rect y="160" width="600" height="60" fill="#d4956a"/><line x1="0" y1="177" x2="600" y2="177" stroke="#c4855a" stroke-width="1.5"/><rect x="20" y="105" width="560" height="58" rx="4" fill="#c0784a"/><rect x="20" y="105" width="560" height="9" rx="2" fill="#b06838"/><rect x="28" y="118" width="80" height="40" rx="3" fill="#d08848" stroke="#b06838" stroke-width="1.5"/><rect x="116" y="118" width="80" height="40" rx="3" fill="#d08848" stroke="#b06838" stroke-width="1.5"/><rect x="204" y="118" width="80" height="40" rx="3" fill="#d08848" stroke="#b06838" stroke-width="1.5"/><rect x="292" y="118" width="80" height="40" rx="3" fill="#d08848" stroke="#b06838" stroke-width="1.5"/><rect x="380" y="118" width="80" height="40" rx="3" fill="#d08848" stroke="#b06838" stroke-width="1.5"/><rect x="468" y="118" width="110" height="40" rx="3" fill="#d08848" stroke="#b06838" stroke-width="1.5"/><circle cx="68" cy="138" r="4" fill="#888"/><circle cx="156" cy="138" r="4" fill="#888"/><circle cx="244" cy="138" r="4" fill="#888"/><circle cx="332" cy="138" r="4" fill="#888"/><circle cx="420" cy="138" r="4" fill="#888"/><circle cx="523" cy="138" r="4" fill="#888"/><rect x="18" y="100" width="564" height="10" rx="3" fill="#e8e8e8"/><rect x="240" y="84" width="120" height="22" rx="3" fill="#ccc"/><rect x="248" y="88" width="104" height="14" rx="2" fill="#aaa"/><ellipse cx="300" cy="80" rx="8" ry="14" fill="#999"/><rect x="380" y="86" width="80" height="20" rx="2" fill="#555"/><circle cx="400" cy="95" r="9" fill="#444" stroke="#666" stroke-width="1.5"/><circle cx="440" cy="95" r="9" fill="#444" stroke="#666" stroke-width="1.5"/><circle cx="400" cy="95" r="5" fill="#c0392b"/><circle cx="440" cy="95" r="5" fill="#c0392b"/><rect x="20" y="14" width="200" height="60" rx="4" fill="#c0784a"/><rect x="28" y="19" width="88" height="48" rx="3" fill="#d08848" stroke="#b06838" stroke-width="1.5"/><rect x="124" y="19" width="88" height="48" rx="3" fill="#d08848" stroke="#b06838" stroke-width="1.5"/><circle cx="72" cy="43" r="4" fill="#888"/><circle cx="168" cy="43" r="4" fill="#888"/><rect x="390" y="10" width="110" height="76" rx="4" fill="#b8e4f9" stroke="#8cb8d4" stroke-width="2"/><line x1="445" y1="10" x2="445" y2="86" stroke="#8cb8d4" stroke-width="1.5"/><line x1="390" y1="48" x2="500" y2="48" stroke="#8cb8d4" stroke-width="1.5"/><circle cx="415" cy="30" r="12" fill="#ffd700" opacity="0.7"/><ellipse cx="320" cy="97" rx="18" ry="15" fill="#e05a5a"/><ellipse cx="160" cy="102" rx="30" ry="9" fill="#c78f5a"/><circle cx="148" cy="95" r="10" fill="#e8845a"/><circle cx="163" cy="93" r="11" fill="#5cb85c"/><circle cx="176" cy="95" r="9" fill="#ffd700"/><rect x="512" y="68" width="12" height="32" rx="3" fill="#8B6914"/><ellipse cx="518" cy="62" rx="22" ry="20" fill="#5cb85c"/><rect x="100" y="136" width="24" height="30" rx="2" fill="#e84393" opacity="0.8"/>';
+  const BATHROOM_SVG = '<rect width="600" height="220" fill="#e8f4fa"/><rect width="600" height="160" fill="#d4ecf7"/><g stroke="#b8d8ea" stroke-width="1" fill="none"><line x1="0" y1="32" x2="600" y2="32"/><line x1="0" y1="64" x2="600" y2="64"/><line x1="0" y1="96" x2="600" y2="96"/><line x1="0" y1="128" x2="600" y2="128"/><line x1="60" y1="0" x2="60" y2="160"/><line x1="120" y1="0" x2="120" y2="160"/><line x1="180" y1="0" x2="180" y2="160"/><line x1="240" y1="0" x2="240" y2="160"/><line x1="300" y1="0" x2="300" y2="160"/><line x1="360" y1="0" x2="360" y2="160"/><line x1="420" y1="0" x2="420" y2="160"/><line x1="480" y1="0" x2="480" y2="160"/><line x1="540" y1="0" x2="540" y2="160"/></g><rect y="160" width="600" height="60" fill="#c8dde8"/><rect x="20" y="105" width="200" height="60" rx="20" fill="#fff" stroke="#b0ccd8" stroke-width="2"/><rect x="30" y="115" width="180" height="44" rx="15" fill="#e8f8ff"/><rect x="108" y="97" width="8" height="14" rx="4" fill="#aaa"/><rect x="96" y="93" width="32" height="8" rx="4" fill="#bbb"/><circle cx="80" cy="132" r="9" fill="white" opacity="0.7"/><circle cx="105" cy="126" r="7" fill="white" opacity="0.6"/><circle cx="145" cy="130" r="10" fill="white" opacity="0.7"/><circle cx="175" cy="124" r="8" fill="white" opacity="0.6"/><rect x="260" y="105" width="100" height="60" rx="8" fill="#fff" stroke="#b0ccd8" stroke-width="2"/><ellipse cx="310" cy="148" rx="38" ry="13" fill="#e0f0f8"/><rect x="305" y="97" width="10" height="14" rx="5" fill="#aaa"/><rect x="260" y="14" width="100" height="70" rx="6" fill="#ddf0fa" stroke="#b0ccd8" stroke-width="2"/><line x1="275" y1="24" x2="292" y2="68" stroke="white" stroke-width="3" opacity="0.5"/><ellipse cx="480" cy="152" rx="52" ry="20" fill="#fff" stroke="#b0ccd8" stroke-width="2"/><rect x="445" y="108" width="70" height="50" rx="8" fill="#f0f8ff" stroke="#b0ccd8" stroke-width="2"/><rect x="438" y="100" width="84" height="14" rx="6" fill="#e0eef8" stroke="#b0ccd8" stroke-width="2"/><rect x="370" y="100" width="28" height="55" rx="8" fill="#5b9bd5"/><rect x="376" y="91" width="16" height="12" rx="4" fill="#4a8ac4"/><rect x="530" y="45" width="8" height="85" rx="4" fill="#aaa"/><rect x="534" y="56" width="42" height="30" rx="3" fill="#5b9bd5" opacity="0.9"/><rect x="534" y="90" width="42" height="30" rx="3" fill="#e8845a" opacity="0.9"/><rect x="60" y="76" width="10" height="30" rx="3" fill="#8B6914"/><ellipse cx="65" cy="70" rx="17" ry="15" fill="#5cb85c"/>';
+  const BEDROOM_SVG = '<rect width="600" height="220" fill="#fdf0f8"/><rect width="600" height="160" fill="#f5e0f0"/><g fill="#e8c8e0" opacity="0.5"><circle cx="40" cy="28" r="4"/><circle cx="100" cy="55" r="4"/><circle cx="160" cy="22" r="4"/><circle cx="220" cy="48" r="4"/><circle cx="280" cy="28" r="4"/><circle cx="340" cy="55" r="4"/><circle cx="400" cy="22" r="4"/><circle cx="460" cy="48" r="4"/><circle cx="520" cy="28" r="4"/></g><rect y="160" width="600" height="60" fill="#c4956a"/><ellipse cx="250" cy="176" rx="140" ry="32" fill="#c97db5" opacity="0.4"/><rect x="80" y="90" width="300" height="75" rx="8" fill="#c0784a"/><rect x="88" y="98" width="284" height="60" rx="6" fill="#fff8f0"/><rect x="96" y="102" width="90" height="48" rx="8" fill="#fff" stroke="#e8c8d8" stroke-width="2"/><rect x="194" y="102" width="90" height="48" rx="8" fill="#fff" stroke="#e8c8d8" stroke-width="2"/><rect x="88" y="126" width="284" height="32" rx="6" fill="#c97db5" opacity="0.7"/><rect x="75" y="62" width="310" height="34" rx="10" fill="#a05a2a"/><rect x="20" y="110" width="55" height="55" rx="6" fill="#c0784a"/><rect x="25" y="116" width="45" height="42" rx="4" fill="#d08848"/><circle cx="47" cy="125" r="4" fill="#888"/><rect x="40" y="80" width="8" height="30" rx="3" fill="#bbb"/><ellipse cx="44" cy="76" rx="20" ry="13" fill="#ffd97a" opacity="0.9"/><rect x="385" y="110" width="55" height="55" rx="6" fill="#c0784a"/><rect x="390" y="116" width="45" height="42" rx="4" fill="#d08848"/><rect x="460" y="34" width="120" height="132" rx="6" fill="#c0784a"/><rect x="466" y="40" width="50" height="120" rx="4" fill="#d08848" stroke="#b06838" stroke-width="1.5"/><rect x="522" y="40" width="52" height="120" rx="4" fill="#d08848" stroke="#b06838" stroke-width="1.5"/><circle cx="492" cy="102" r="5" fill="#888"/><circle cx="547" cy="102" r="5" fill="#888"/><rect x="473" y="48" width="36" height="58" rx="3" fill="#d4ecf7" stroke="#b0ccd8" stroke-width="1.5"/><rect x="20" y="12" width="120" height="85" rx="4" fill="#87ceeb" stroke="#6baed6" stroke-width="2"/><line x1="80" y1="12" x2="80" y2="97" stroke="#6baed6" stroke-width="1.5"/><line x1="20" y1="54" x2="140" y2="54" stroke="#6baed6" stroke-width="1.5"/><path d="M20 12 Q36 54 20 97" fill="#c97db5" opacity="0.6"/><path d="M140 12 Q124 54 140 97" fill="#c97db5" opacity="0.6"/><rect x="15" y="10" width="130" height="5" rx="2.5" fill="#888"/>';
+  const LIVING_SVG = '<rect width="600" height="220" fill="#fdf6ec"/><rect width="600" height="160" fill="#f5ede0"/><rect y="160" width="600" height="60" fill="#c8a878"/><line x1="0" y1="177" x2="600" y2="177" stroke="#b89868" stroke-width="1.5"/><ellipse cx="280" cy="172" rx="160" ry="22" fill="#c8956a" opacity="0.4"/><rect x="60" y="108" width="260" height="55" rx="12" fill="#8b6f47"/><rect x="60" y="108" width="260" height="18" rx="10" fill="#a07848"/><rect x="68" y="126" width="72" height="32" rx="8" fill="#9a7040"/><rect x="148" y="126" width="72" height="32" rx="8" fill="#9a7040"/><rect x="228" y="126" width="72" height="32" rx="8" fill="#9a7040"/><rect x="60" y="118" width="18" height="45" rx="6" fill="#7a5f37"/><rect x="302" y="118" width="18" height="45" rx="6" fill="#7a5f37"/><rect x="78" y="129" width="54" height="24" rx="6" fill="#e8845a" opacity="0.85"/><rect x="158" y="129" width="54" height="24" rx="6" fill="#5b9bd5" opacity="0.85"/><rect x="238" y="129" width="54" height="24" rx="6" fill="#c97db5" opacity="0.85"/><rect x="120" y="160" width="140" height="8" rx="3" fill="#a07848"/><rect x="130" y="168" width="6" height="12" rx="2" fill="#8b6430"/><rect x="248" y="168" width="6" height="12" rx="2" fill="#8b6430"/><rect x="155" y="154" width="30" height="8" rx="2" fill="#e8845a"/><rect x="200" y="150" width="16" height="12" rx="3" fill="#c0784a"/><ellipse cx="208" cy="144" rx="14" ry="12" fill="#5cb85c"/><ellipse cx="200" cy="148" rx="10" ry="9" fill="#4a9a4a"/><rect x="380" y="108" width="180" height="55" rx="6" fill="#7a5f37"/><rect x="388" y="115" width="164" height="38" rx="4" fill="#1a1a2e"/><rect x="392" y="119" width="156" height="30" rx="3" fill="#2a2a4e"/><rect x="394" y="121" width="152" height="26" rx="2" fill="#3a4a8a" opacity="0.6"/><rect x="430" y="163" width="8" height="14" rx="2" fill="#6a4f27"/><rect x="510" y="163" width="8" height="14" rx="2" fill="#6a4f27"/><rect x="20" y="10" width="110" height="80" rx="4" fill="#b8ddf9" stroke="#8cb8d4" stroke-width="2"/><line x1="75" y1="10" x2="75" y2="90" stroke="#8cb8d4" stroke-width="1.5"/><line x1="20" y1="50" x2="130" y2="50" stroke="#8cb8d4" stroke-width="1.5"/><path d="M20 10 Q34 50 20 90" fill="#e8c87a" opacity="0.4"/><path d="M130 10 Q116 50 130 90" fill="#e8c87a" opacity="0.4"/><rect x="15" y="8" width="120" height="5" rx="2.5" fill="#888"/><rect x="355" y="30" width="6" height="128" rx="3" fill="#aaa"/><ellipse cx="358" cy="28" rx="22" ry="14" fill="#ffd97a" opacity="0.85"/><ellipse cx="358" cy="158" rx="14" ry="5" fill="#999"/><rect x="540" y="20" width="55" height="135" rx="4" fill="#a07848"/><rect x="545" y="26" width="45" height="22" rx="2" fill="#8b6430"/><rect x="545" y="52" width="45" height="22" rx="2" fill="#8b6430"/><rect x="545" y="78" width="45" height="22" rx="2" fill="#8b6430"/><rect x="547" y="28" width="10" height="18" rx="1" fill="#e05a5a"/><rect x="559" y="28" width="8" height="18" rx="1" fill="#5b9bd5"/><rect x="569" y="28" width="10" height="18" rx="1" fill="#5cb85c"/><rect x="547" y="54" width="12" height="18" rx="1" fill="#ffd700"/><rect x="561" y="54" width="8" height="18" rx="1" fill="#c97db5"/><rect x="547" y="80" width="9" height="18" rx="1" fill="#e8845a"/><rect x="558" y="80" width="11" height="18" rx="1" fill="#5b9bd5"/>';
+  const ROOM_SVGS = {Kitchen:KITCHEN_SVG,Bathroom:BATHROOM_SVG,Bedroom:BEDROOM_SVG,"Living Room":LIVING_SVG};
+  const ROOM_LABELS = {Kitchen:"Kitchen",Bathroom:"Bathroom",Bedroom:"Bedroom","Living Room":"Living Room"};
+
+  function setStatus(s,t){document.getElementById("sync-dot").className="dot "+s;document.getElementById("sync-text").textContent=t;}
+  function updateCounts(){["Kitchen","Bathroom","Bedroom","Living Room"].forEach(r=>{const el=document.getElementById("count-"+r);if(el){const n=window._solutions.filter(s=>s.room===r).length;el.textContent=n+" recipe"+(n!==1?"s":"");}});}
+  function goToRoom(room){window._currentRoom=room;document.getElementById("room-page-title").innerHTML=ROOM_LABELS[room]||room;document.getElementById("room-header-img").innerHTML=ROOM_SVGS[room]||"";document.getElementById("recipe-search").value="";showPage("page-room");renderRecipes();}
+  function goHome(){showPage("page-home");updateCounts();}
+  function showPage(id){document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));document.getElementById(id).classList.add("active");window.scrollTo(0,0);}
+
+  function renderRecipes(){
+    const search=(document.getElementById("recipe-search").value||"").toLowerCase();
+    const filtered=window._solutions.filter(s=>s.room===window._currentRoom&&(!search||s.name.toLowerCase().includes(search)||(s.ingredients||[]).some(i=>i.item.toLowerCase().includes(search))));
+    const list=document.getElementById("recipes-list"),empty=document.getElementById("room-empty"),noRes=document.getElementById("room-no-results");
+    const total=window._solutions.filter(s=>s.room===window._currentRoom).length;
+    if(total===0){list.innerHTML="";empty.style.display="";noRes.style.display="none";return;}
+    if(filtered.length===0){list.innerHTML="";empty.style.display="none";noRes.style.display="";return;}
+    empty.style.display="none";noRes.style.display="none";
+    list.innerHTML=filtered.map(s=>`<div class="recipe-card">
+      <div class="recipe-card-top" onclick="toggleRecipe('${s.id}')">
+        <div class="recipe-name">${esc(s.name)}</div>
+        <div class="recipe-tags"><span class="recipe-tag">&#x2736; ${esc(s.surface)}</span></div>
+      </div>
+      <div class="recipe-card-actions">
+        <button class="btn-sm btn-pdf" onclick="downloadPDF('${s.id}')">&#x2B07; PDF</button>
+        <button class="btn-sm btn-edit" onclick="openModal('${s.id}')">&#x270E;</button>
+        <button class="btn-sm btn-del" onclick="askDelete('${s.id}')">&#x1F5D1;</button>
+      </div>
+      <div class="recipe-expand" id="expand-${s.id}" style="display:none;">
+        <p class="expand-section-title">Ingredients</p>
+        <p class="instr-text" style="white-space:pre-line;">${esc(s.ingredients_text||((s.ingredients||[]).map(i=>(i.amount?i.amount+' — ':'')+i.item).join('\n')))}</p>
+        <p class="expand-section-title">Instructions</p>
+        <p class="instr-text">${esc(s.instructions)}</p>
+        ${s.tips?`<p class="expand-section-title">Tips &amp; Notes</p><div class="tips-box">${esc(s.tips)}</div>`:""}
+      </div>
+    </div>`).join("");
+  }
+
+  function toggleRecipe(id){const el=document.getElementById("expand-"+id);if(el)el.style.display=el.style.display==="none"?"block":"none";}
+  function esc(str){if(!str)return"";return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+  function openModal(id){
+    window._editingId=id||null;
+    document.getElementById("modal-title").textContent=id?"Edit Recipe":"New Recipe";
+    document.getElementById("btn-save").textContent=id?"Save Changes":"Save Recipe";
+    if(id){
+      const s=window._solutions.find(s=>s.id===id);if(!s)return;
+      document.getElementById("f-name").value=s.name||"";
+      document.getElementById("f-surface").value=s.surface||"Glass";
+      document.getElementById("f-ingredients").value=s.ingredients_text||((s.ingredients||[]).map(i=>(i.amount?i.amount+' — ':'')+i.item).join('\n'));
+      document.getElementById("f-instructions").value=s.instructions||"";
+      document.getElementById("f-tips").value=s.tips||"";
+    }else{
+      document.getElementById("f-name").value="";
+      document.getElementById("f-surface").value="Glass";
+      document.getElementById("f-ingredients").value="";
+      document.getElementById("f-instructions").value="";
+      document.getElementById("f-tips").value="";
+    }
+    document.getElementById("modal-overlay").classList.add("open");
+  }
+  function closeModal(){document.getElementById("modal-overlay").classList.remove("open");window._editingId=null;}
+  function handleOverlayClick(e){if(e.target===document.getElementById("modal-overlay"))closeModal();}
+  async function saveSolution(){
+    const name=document.getElementById("f-name").value.trim();
+    if(!name){alert("Please enter a recipe name.");return;}
+    const data={name,room:window._currentRoom,surface:document.getElementById("f-surface").value,ingredients_text:document.getElementById("f-ingredients").value.trim(),instructions:document.getElementById("f-instructions").value.trim(),tips:document.getElementById("f-tips").value.trim(),updatedAt:new Date().toISOString()};
+    try{if(window._editingId){await window._updateDoc(window._editingId,data);}else{data.createdAt=new Date().toISOString();await window._addDoc(data);}closeModal();}
+    catch(e){alert("Error: "+e.message);}
+  }
+  function askDelete(id){window._deletingId=id;document.getElementById("confirm-overlay").style.display="flex";}
+  function cancelDelete(){window._deletingId=null;document.getElementById("confirm-overlay").style.display="none";}
+  async function confirmDelete(){if(!window._deletingId)return;try{await window._deleteDoc(window._deletingId);}catch(e){alert("Error: "+e.message);}cancelDelete();}
+  function downloadPDF(id){const s=window._solutions.find(s=>s.id===id);if(!s)return;const win=window.open("","_blank");const ings=s.ingredients_text||((s.ingredients||[]).map(i=>(i.amount?i.amount+' — ':'')+i.item).join('\n'));win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+s.name+'</title><link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet"/><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Nunito,sans-serif;color:#2c3e2d;padding:50px;max-width:700px;margin:0 auto}.brand{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#4a7c59;font-weight:800;margin-bottom:14px}h1{font-family:"Fredoka One",cursive;font-size:34px;color:#2d5a3d;margin-bottom:12px}.tags{display:flex;gap:10px;margin-bottom:24px}.tag{background:#e8f5ec;color:#2d6e3e;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:800}hr{border:none;border-top:2px solid #e8f5ec;margin-bottom:24px}.sec{margin-bottom:22px}.sec-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#4a7c59;font-weight:800;margin-bottom:10px}p{font-size:14px;line-height:1.8;color:#3d4e3e;white-space:pre-line}.tips{background:#f0f9f3;border-left:4px solid #4a7c59;padding:14px 18px;border-radius:0 10px 10px 0}.footer{margin-top:48px;padding-top:14px;border-top:1px solid #e8f5ec;display:flex;justify-content:space-between;font-size:11px;color:#999;text-transform:uppercase}@media print{button{display:none}}</style></head><body><div class="brand">Your Cleaning Solutions</div><h1>'+s.name+'</h1><div class="tags"><span class="tag">'+s.room+'</span><span class="tag">'+s.surface+'</span></div><hr/><div class="sec"><div class="sec-label">Ingredients</div><p>'+ings+'</p></div><div class="sec"><div class="sec-label">Instructions</div><p>'+(s.instructions||'')+'</p></div>'+(s.tips?'<div class="sec"><div class="sec-label">Tips &amp; Notes</div><div class="tips"><p>'+s.tips+'</p></div></div>':'')+'<div class="footer"><span>Your Cleaning Solutions</span><span>Printed '+new Date().toLocaleDateString()+'</span></div><script>window.onload=()=>window.print()<\/script></body></html>');win.document.close();}
+  document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal();});
+</script>
+</body>
+</html>
